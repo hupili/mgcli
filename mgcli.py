@@ -33,6 +33,17 @@ def save_config(domain, api_key, from_address):
             }
 
 
+def _limit_length(data, field, length):
+    if field not in data:
+        return
+    else:
+        if data[field] <= length:
+            return
+        else:
+            data[field] = data[field][:length] + '...'
+            return
+
+
 def send(to, subject, html=None, text=None):
     config = load_config()
     url = 'https://api.mailgun.net/v2/%s/messages' % config['domain']
@@ -55,6 +66,10 @@ def send(to, subject, html=None, text=None):
     re = requests.post(url,
             auth=('api', config['api_key']),
             data=data)
+
+    _limit_length(data, 'text', 50)
+    _limit_length(data, 'html', 50)
+
     return {
             'data': data,
             'result': re
