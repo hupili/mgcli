@@ -5,12 +5,22 @@ import requests
 import json
 from pprint import pprint
 
+__version__ = '0.0.1'
+
 DOC = '''
+{0} version {1}
+
 Usage:
     {0} config get
     {0} config set <domain> <api_key> <from_address>
     {0} send <to> <subject> [--html=<fn_html>] [--text=<fn_text>]
-'''.format(path.basename(__file__))
+    {0} --help
+
+Options:
+    --help             Show this message
+    --html=<fn_html>   The file containing the HTML email body
+    --text=<fn_text>   The file containing the text email body
+'''.format(path.basename(__file__), __version__)
 
 
 FN_CONFIG=path.expanduser('~/.mgclirc')
