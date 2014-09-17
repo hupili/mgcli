@@ -13,13 +13,14 @@ DOC = '''
 Usage:
     {0} config get
     {0} config set <domain> <api_key> <from_address>
-    {0} send <to> <subject> [--html=<fn_html>] [--text=<fn_text>]
+    {0} send <to> <subject> [--html=<file>] [--text=<file>] [--attachment=<file>]
     {0} --help
 
 Options:
-    --help             Show this message
-    --html=<fn_html>   The file containing the HTML email body
-    --text=<fn_text>   The file containing the text email body
+    --help                   Show this message
+    --html=<file>            The file containing the HTML email body
+    --text=<file>            The file containing the text email body
+    --attachment=<file>      The file containing the text email attachment
 '''.format(path.basename(__file__), __version__)
 
 
@@ -54,7 +55,7 @@ def _limit_length(data, field, length):
             return
 
 
-def send(to, subject, html=None, text=None):
+def send(to, subject, html=None, text=None, attachment=None):
     config = load_config()
     url = 'https://api.mailgun.net/v2/%s/messages' % config['domain']
     data={'from': config['from_address'],
@@ -71,10 +72,17 @@ def send(to, subject, html=None, text=None):
     else:
         pprint('Warning: No email body is defined. Will send null message.')
         data.update({
-            'text': ''
+            'text': 'null body'
             })
+
+    if attachment:
+        files = [('attachment', open(attachment))]
+    else:
+        files = None
+
     re = requests.post(url,
             auth=('api', config['api_key']),
+            files=files,
             data=data)
 
     _limit_length(data, 'text', 50)
@@ -106,7 +114,11 @@ def main():
         else:
             assert(False)
     elif args['send']:
-        return send(args['<to>'], args['<subject>'], args['--html'], args['--text'])
+        return send(args['<to>'],
+                args['<subject>'],
+                args['--html'],
+                args['--text'],
+                args['--attachment'])
     else:
         assert(False)
 
