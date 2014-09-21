@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import sys
 from os import path
 import docopt
@@ -5,7 +7,7 @@ import requests
 import json
 from pprint import pprint
 
-__version__ = '0.0.1'
+__version__ = '0.0.7'
 
 DOC = '''
 {0} version {1}
