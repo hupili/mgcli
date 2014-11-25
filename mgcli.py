@@ -9,7 +9,7 @@ import pandas
 import jinja2
 from pprint import pprint
 
-__version__ = '0.0.7'
+__version__ = '0.0.8'
 
 DOC = '''
 {0} version {1}
