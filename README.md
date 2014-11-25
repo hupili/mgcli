@@ -14,10 +14,6 @@ This small tool is just like any other CLI programs.
 
 ```
 %python mgcli.py -h
-Usage:
-    mgcli.py config get
-    mgcli.py config set <domain> <api_key> <from_address>
-    mgcli.py send <to> <subject> [--html=<fn_html>] [--text=<fn_text>]
 ```
 
 ## License

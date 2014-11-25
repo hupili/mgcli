@@ -5,6 +5,8 @@ from os import path
 import docopt
 import requests
 import json
+import pandas
+import jinja2
 from pprint import pprint
 
 __version__ = '0.0.7'
@@ -16,6 +18,7 @@ Usage:
     {0} config get
     {0} config set <domain> <api_key> <from_address>
     {0} send <to> <subject> [--html=<file>] [--text=<file>] [--attachment=<file>]
+    {0} send_template <subject> <template.html> <data.csv>
     {0} --help
 
 Options:
@@ -57,7 +60,7 @@ def _limit_length(data, field, length):
             return
 
 
-def send(to, subject, html=None, text=None, attachment=None):
+def _send(to, subject, html=None, text=None, attachment=None):
     config = load_config()
     url = 'https://api.mailgun.net/v2/%s/messages' % config['domain']
     data={'from': config['from_address'],
@@ -65,11 +68,11 @@ def send(to, subject, html=None, text=None, attachment=None):
             'subject': subject}
     if html:
         data.update({
-            'html': open(html).read()
+            'html': html
             })
     elif text:
         data.update({
-            'text': open(text).read()
+            'text': text
             })
     else:
         pprint('Warning: No email body is defined. Will send null message.')
@@ -96,6 +99,28 @@ def send(to, subject, html=None, text=None, attachment=None):
             }
 
 
+def send(to, subject, html=None, text=None, attachment=None):
+    if html:
+        return _send(to, subject, html=open(html).read(), text=None, attachment=None)
+    elif text:
+        return _send(to, subject, html=None, text=open(text).read(), attachment=None)
+    else:
+        return _send(to, subject, html=None, text=None, attachment=None)
+
+
+def send_template(subject, fn_template, fn_data):
+    subject_template = jinja2.Template(subject)
+    body_template = jinja2.Template(open(fn_template).read())
+    data = pandas.read_csv(fn_data)
+    ret = []
+    for i, row in data.iterrows():
+        to = row['to']
+        subject = subject_template.render(row)
+        body = body_template.render(row)
+        ret.append(_send(to, subject, html=body))
+    return ret
+
+
 def main():
     args = docopt.docopt(DOC)
 
@@ -116,11 +141,19 @@ def main():
         else:
             assert(False)
     elif args['send']:
-        return send(args['<to>'],
+        return send(
+                args['<to>'],
                 args['<subject>'],
                 args['--html'],
                 args['--text'],
-                args['--attachment'])
+                args['--attachment']
+                )
+    elif args['send_template']:
+        return send_template(
+                args['<subject>'],
+                args['<template.html>'],
+                args['<data.csv>']
+                )
     else:
         assert(False)
 
