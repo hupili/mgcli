@@ -15,11 +15,16 @@ DOC = '''
 {0} version {1}
 
 Usage:
-    {0} config get
-    {0} config set <domain> <api_key> <from_address>
-    {0} send <to> <subject> [--html=<file>] [--text=<file>] [--attachment=<file>]
-    {0} send_template <subject> <template.html> <data.csv>
+    {0} config list
+    {0} config get <key>
+    {0} config set <key> <domain> <api_key> <from_address>
+    {0} config del <key>
+    {0} send <key> <to> <subject> [--html=<file>] [--text=<file>] [--attachment=<file>]
+    {0} send_template <key> <subject> <template.html> <data.csv>
     {0} --help
+
+Args:
+    <key>     The key of configuration item
 
 Options:
     --help                   Show this message
@@ -33,11 +38,42 @@ FN_CONFIG=path.expanduser('~/.mgclirc')
 
 
 def load_config():
-    return json.load(open(FN_CONFIG))
+    try:
+        return json.load(open(FN_CONFIG))
+    except IOError:
+        # No such file
+        pprint("Warning: can not find ~/.mgclirc. Use config '{}'")
+        return {}
 
 
-def save_config(domain, api_key, from_address):
-    config = {
+def list_config():
+    config = load_config()
+    return {
+            'configurations': config.keys()
+            }
+
+
+def get_config(key):
+    config = load_config()
+    return {
+            key: config.get(key, None)
+            }
+
+
+def del_config(key):
+    config = load_config()
+    if key in config:
+        del config[key]
+    json.dump(config, open(FN_CONFIG, 'w'))
+    return {
+            'ret': 'saved',
+            'config': config
+            }
+
+
+def set_config(key, domain, api_key, from_address):
+    config = load_config()
+    config[key] = {
             'domain': domain,
             'api_key': api_key,
             'from_address': from_address
@@ -60,12 +96,15 @@ def _limit_length(data, field, length):
             return
 
 
-def _send(to, subject, html=None, text=None, attachment=None):
-    config = load_config()
+def _send(key, to, subject, html=None, text=None, attachment=None):
+    config = get_config(key)[key]
     url = 'https://api.mailgun.net/v2/%s/messages' % config['domain']
-    data={'from': config['from_address'],
+    data = {
+            'config': config,
+            'from': config['from_address'],
             'to': to,
-            'subject': subject}
+            'subject': subject
+            }
     if html:
         data.update({
             'html': html
@@ -99,16 +138,16 @@ def _send(to, subject, html=None, text=None, attachment=None):
             }
 
 
-def send(to, subject, html=None, text=None, attachment=None):
+def send(key, to, subject, html=None, text=None, attachment=None):
     if html:
-        return _send(to, subject, html=open(html).read(), text=None, attachment=None)
+        return _send(key, to, subject, html=open(html).read(), text=None, attachment=None)
     elif text:
-        return _send(to, subject, html=None, text=open(text).read(), attachment=None)
+        return _send(key, to, subject, html=None, text=open(text).read(), attachment=None)
     else:
-        return _send(to, subject, html=None, text=None, attachment=None)
+        return _send(key, to, subject, html=None, text=None, attachment=None)
 
 
-def send_template(subject, fn_template, fn_data):
+def send_template(key, subject, fn_template, fn_data):
     subject_template = jinja2.Template(subject)
     body_template = jinja2.Template(open(fn_template).read())
     data = pandas.read_csv(fn_data)
@@ -117,31 +156,33 @@ def send_template(subject, fn_template, fn_data):
         to = row['to']
         subject = subject_template.render(row)
         body = body_template.render(row)
-        ret.append(_send(to, subject, html=body))
+        ret.append(_send(key, to, subject, html=body))
     return ret
 
 
 def main():
     args = docopt.docopt(DOC)
 
-    try:
-        config = load_config()
-    except IOError:
-        pprint('warning: can not find ~/.mgclirc, we have created one for you')
-        save_config('domain', 'api_key', 'from_address')
-        config = load_config()
+    config = load_config()
 
     if args['config']:
-        if args['get']:
-            return load_config()
+        if args['list']:
+            return list_config()
+        elif args['get']:
+            return get_config(args['<key>'])
         elif args['set']:
-            return save_config(args['<domain>'],
+            return set_config(
+                    args['<key>'],
+                    args['<domain>'],
                     args['<api_key>'],
                     args['<from_address>'])
+        elif args['del']:
+            return del_config(args['<key>'])
         else:
             assert(False)
     elif args['send']:
         return send(
+                args['<key>'],
                 args['<to>'],
                 args['<subject>'],
                 args['--html'],
@@ -150,6 +191,7 @@ def main():
                 )
     elif args['send_template']:
         return send_template(
+                args['<key>'],
                 args['<subject>'],
                 args['<template.html>'],
                 args['<data.csv>']
