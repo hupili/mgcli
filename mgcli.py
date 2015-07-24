@@ -9,7 +9,7 @@ import pandas
 import jinja2
 from pprint import pprint
 
-__version__ = '0.0.9'
+__version__ = '0.0.10'
 
 DOC = '''
 {0} version {1}
@@ -89,7 +89,7 @@ def _limit_length(data, field, length):
     if field not in data:
         return
     else:
-        if data[field] <= length:
+        if len(data[field]) <= length:
             return
         else:
             data[field] = data[field][:length] + '...'
