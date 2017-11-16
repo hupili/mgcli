@@ -1,2 +1,4 @@
 docopt
+jinja2
+pandas
 requests
