@@ -1,3 +1,7 @@
 FROM python:onbuild
 
-ENTRYPOINT [ "./mgcli.py" ]
+RUN mkdir /data
+WORKDIR /data
+
+ENTRYPOINT [ "/usr/src/app/mgcli.py" ]
+

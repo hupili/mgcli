@@ -19,7 +19,7 @@ This small tool is just like any other CLI programs.
 Or if you prefer dockerised environment:
 
 ```
-docker run -v $HOME/.mgclirc:/root/.mgclirc --rm -it hupili/mgcli
+docker run -v $HOME/.mgclirc:/root/.mgclirc -v $(pwd):/data/ --rm -it hupili/mgcli
 ```
 
 ## For maintainer
