@@ -16,6 +16,20 @@ This small tool is just like any other CLI programs.
 %python mgcli.py -h
 ```
 
+Or if you prefer dockerised environment:
+
+```
+docker run -v $HOME/.mgclirc:/root/.mgclirc --rm -it hupili/mgcli
+```
+
+## For maintainer
+
+Rebuild the image:
+
+```
+docker build -t hupili/mgcli .
+```
+
 ## License
 
 MIT
