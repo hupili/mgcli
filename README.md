@@ -4,25 +4,26 @@ Simple CLI to play with MailGun
 
 ## Usage
 
-First familiarize yourself with some backgrounds of MailGun,
-e.g. via the official [quickstart guide](http://documentation.mailgun.com/quickstart.html)
+Preparation:
 
-Second, configure your domain and acquire `API_KEY` from the web UI of MailGun.
+* Familiarize yourself with some backgrounds of MailGun, e.g. via the official [quickstart guide](http://documentation.mailgun.com/quickstart.html)
+* Configure your domain and acquire `API_KEY` from the web UI of MailGun.
 
 You're all set.
 This small tool is just like any other CLI programs.
 
 ```
-%python mgcli.py -h
+python mgcli.py -h
 ```
 
 Or if you prefer dockerised environment:
 
 ```
-docker run -v $HOME/.mgclirc:/root/.mgclirc -v $(pwd):/data/ --rm -it hupili/mgcli
+docker run -v $HOME/.mgcli/:/root/.mgcli/ -v $(pwd):/data/ --rm -it hupili/mgcli
 ```
 
-Note, if you choose to run by docker, please `echo '{}' > ~/.mgclirc` before the first execution. This command basically creates an empty configuratoin files mgcli tool. Or docker will likely create a directory at path `~/.mgclirc`, instead of a file.
+* `-v $HOME/.mgcli/:/root/.mgcli/` mounts the configurations which will be stored at your `~/.mgcli/mgclirc`
+* `-v $(pwd):/data/` mounts the current folder (where you run the container on host) to the working folder in container (i.e. `/data`)
 
 ## For maintainer
 

@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import sys
+import os
 from os import path
 import docopt
 import requests
@@ -34,15 +35,23 @@ Options:
 '''.format(path.basename(__file__), __version__)
 
 
-FN_CONFIG=path.expanduser('~/.mgclirc')
-
+# Use ~/.mgcli/ dir as a workaround for docker mounting issue.
+# Docker by default mount path as directory. Upon the first 
+# execution, there is no config file and mounting dir allows 
+# the mgcli script to create it inside container.
+FN_CONFIG = path.expanduser('~/.mgcli/mgclirc')
+DIR_CONFIG = path.dirname(FN_CONFIG)
+if not os.path.exists(DIR_CONFIG):
+    os.makedirs(DIR_CONFIG)
+if not os.path.exists(FN_CONFIG):
+    pprint("Warning: can not find '%s'. Use config '{}'" % FN_CONFIG)
+    json.dump({}, open(FN_CONFIG, 'w'))
 
 def load_config():
     try:
         return json.load(open(FN_CONFIG))
     except IOError:
         # No such file
-        pprint("Warning: can not find ~/.mgclirc. Use config '{}'")
         return {}
 
 
