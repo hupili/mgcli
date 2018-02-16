@@ -36,8 +36,8 @@ Options:
 
 
 # Use ~/.mgcli/ dir as a workaround for docker mounting issue.
-# Docker by default mount path as directory. Upon the first 
-# execution, there is no config file and mounting dir allows 
+# Docker by default mount path as directory. Upon the first
+# execution, there is no config file and mounting dir allows
 # the mgcli script to create it inside container.
 FN_CONFIG = path.expanduser('~/.mgcli/mgclirc')
 DIR_CONFIG = path.dirname(FN_CONFIG)

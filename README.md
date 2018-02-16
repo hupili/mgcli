@@ -33,7 +33,7 @@ Rebuild the image:
 docker build -t {image-name} .
 ```
 
-There is now auto-build `hupili/mgcli` on dockerhub, so the `master` of this repo will be reflected in `hupili/mgcli:latest` automatically. The tags `/release-.*/` will also trigger auto-builds on dockerhub.
+There is now an [Automated Build](https://docs.docker.com/docker-hub/builds/) on Docker Hub at [hupili/mgcli](https://hub.docker.com/r/hupili/mgcli/), so the `master` branch of this repo will be reflected in `hupili/mgcli:latest` automatically. The tags `/release-.*/` will also trigger corresponding image tags auto-builds on Docker Hub.
 
 ## License
 
