@@ -29,8 +29,10 @@ Note, if you choose to run by docker, please `echo '{}' > ~/.mgclirc` before the
 Rebuild the image:
 
 ```
-docker build -t hupili/mgcli .
+docker build -t {image-name} .
 ```
+
+There is now auto-build `hupili/mgcli` on dockerhub, so the `master` of this repo will be reflected in `hupili/mgcli:latest` automatically. The tags `/release-.*/` will also trigger auto-builds on dockerhub.
 
 ## License
 
