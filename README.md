@@ -19,7 +19,7 @@ python mgcli.py -h
 Or if you prefer dockerised environment:
 
 ```
-docker run -v $HOME/.mgcli/:/root/.mgcli/ -v $(pwd):/data/ --rm -it hupili/mgcli
+docker run --rm -it -v $HOME/.mgcli/:/root/.mgcli/ -v $(pwd):/data/ hupili/mgcli
 ```
 
 * `-v $HOME/.mgcli/:/root/.mgcli/` mounts the configurations which will be stored at your `~/.mgcli/mgclirc`
